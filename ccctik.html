@@ -1,0 +1,876 @@
+<?php
+// Redirect HTTP to HTTPS
+if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+    $redirect_url = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+    header("Location: $redirect_url", true, 301);
+    exit();
+}
+
+// Redirect www to non-www
+if (strpos($_SERVER['HTTP_HOST'], 'www.') === 0) {
+    $redirect_url = "https://" . substr($_SERVER['HTTP_HOST'], 4) . $_SERVER['REQUEST_URI'];
+    header("Location: $redirect_url", true, 301);
+    exit();
+}
+
+// Function to set the language cookie
+function setLanguageCookie($lang) {
+    $expiry = time() + (30 * 24 * 60 * 60); // Expiry set to 30 days from now
+    setcookie('lang', $lang, $expiry, '/');
+}
+
+// Check if language selection is provided via GET parameter
+if (isset($_GET['lang'])) {
+    $selectedLang = $_GET['lang'];
+    setLanguageCookie($selectedLang); // Set language preference cookie
+} elseif (isset($_COOKIE['lang'])) { // Check if language preference is stored in cookie
+    $selectedLang = $_COOKIE['lang'];
+} else { // Default language if not set
+    $selectedLang = 'en'; // Default language is French
+}
+
+// Determine if the language is Arabic
+$dir = ($selectedLang === 'ar') ? 'dir="rtl"' : '';
+
+// Get the current URL
+$currentURL = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+$currentURL .= "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+// Load translations based on the selected language
+$translations = json_decode(file_get_contents('lang/' . $selectedLang . '.json'), true);
+
+
+
+// Use translations from $lang array
+// echo $translations['Popular videos'];
+?>
+
+<div class="loading" id="loader">Loading&#8230;</div>
+
+<!doctype html>
+<html lang="en" <?php echo $dir; ?>>
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TikTok Video Downloader</title>
+    <link rel="canonical" href="https://ccctik.com" />
+    <meta name="description" content="TikTok Video Downloader Without watermark! Now you can download TikTok Videos without any restriction. Just paste your TikTok Video Url and download the video.">
+    <meta name="keywords" content="TikTok, TikTok Downloader, TikTok Video Downloader, Download TikTok Videos, Online TikTok Video Downloader, Download TikTok Videos Without Watermark">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://ccctik.com/favicon.png" type="image/png">
+    <link rel="icon" href="https://ccctik.com/favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://ccctik.com/favicon.png">
+    <link rel="icon" href="https://ccctik.com/favicon.ico" type="image/x-icon">
+    <link rel="icon" sizes="16x16" href="https://ccctik.com/favicon-16x16.png" type="image/png">
+    <link rel="icon" sizes="32x32" href="https://ccctik.com/favicon-32x32.png" type="image/png">
+    <link rel="icon" sizes="96x96" href="https://ccctik.com/favicon-96x96.png" type="image/png">
+
+    <meta property="og:title" content="TikTok Video Downloader">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;500;600;700;900&display=swap"
+          as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme-assets/css/app.css">
+    <link rel="stylesheet" href="theme-assets/css/custom.css">
+    <script defer src="-alpinejs/collapse-3.10.3/dist/cdn.min.js"
+            ></script>
+    <script defer src="alpinejs-3.10.3/dist/cdn.min.js"
+            ></script>
+    <link rel="stylesheet" href="toastedjs-0.0.2/dist/toasted.min.css">
+    <!-- pull the js file -->
+    <script defer src="toastedjs-0.0.2/dist/toasted.min.js"
+            ></script>
+    <script defer>
+        document.addEventListener('DOMContentLoaded', function () {
+            window.toasted = new window.Toasted({
+                theme: 'bootstrap',
+                position: 'top-center',
+                duration: 5000,
+            })
+        });
+    </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1780422411108428"
+     ></script>
+     <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-258Z4RMM64"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-258Z4RMM64');
+</script>
+     <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PPGJ8VZ2WK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-PPGJ8VZ2WK');
+</script></head>
+<body>
+<header x-data="HeaderComponent()" class="header" aria-label="Main Header">
+    <div class="logo">
+        <a href="/" aria-label="TikTok Video Downloader">
+            <img src="theme-assets/images/logo.svg" alt="TikTok Video Downloader" aria-hidden="true" height="40" width="150"/>
+        </a>
+    </div>
+    <nav aria-label="Main Navigation" :class="{'is-open': showNav}">
+        <ul>
+        <li>
+        <a href="how-to-save" class=""><?php echo $translations['How to save TikTok video?'];?></a>
+    </li>
+                <li>
+        <a href="download-tiktok-mp3" class=""><?php echo $translations['Download TikTok MP3'];?></a>
+    </li>
+            <li>
+    <a href="blog" class=""><?php echo $translations['Blog'];?></a>
+</li>
+        </ul>
+    </nav>
+    <div>
+    <div class="change-locale mi-start" x-data="ChangeLocaleComponent()" :class="{'is-open': showMenu}">
+    <button class="change-locale-toggle" aria-label="Change locale" @click="toggleMenu()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon mi-end" aria-hidden="true">
+            <!-- Your SVG icon code here -->
+        </svg>
+        <span aria-label="Current locale">English</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="arrow mi-start" aria-hidden="true" >
+            <!-- Your SVG icon code here -->
+        </svg>
+    </button>
+    <div x-show="showMenu" x-cloak x-transition @click.outside="closeMenu()" class="change-locale-menu inset-i-end" dir="ltr">
+        <a href="?lang=en">English</a>
+        <a href="?lang=ar">Arabic</a>
+        <a href="?lang=id">Bahasa Indonesia</a>
+        <a href="?lang=de">Deutsch</a>
+        <a href="?lang=es">Español</a>
+        <a href="?lang=tr">Türkçe</a>
+        <a href="?lang=fr">Français</a>
+        <a href="?lang=ru">Russian</a>
+    </div>
+</div>
+        <button @click="toggleNav()" class="menu-toggle mi-start" aria-label="Toggle Navigation">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" x-show="!showNav" aria-hidden="true" >
+    <path fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10zm0 5.25a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clip-rule="evenodd" />
+</svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" x-show="showNav" x-cloak="true" aria-hidden="true" >
+    <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+</svg>
+        </button>
+    </div>
+</header>
+<section class="splash" aria-label="Download TikTok Video Section" x-data="SplashComponent()"
+         @search-video.window="searchVideo($event)">
+    <div class="container">
+        <div class="splash-form" x-show="!tiktokVideo">
+                                     <h1><?php echo $translations['Download TikTok Video'];?></h1>
+                                      <div id="result" class="mt-3"></div>
+            <!-- <form @submit.prevent="submitForm()" x-ref="form" method="POST" action="fetch.php"> -->
+                <div class="splash-search pi">
+                    <input type="hidden" name="_token" value="xjeigbC4uh8b1NU6M63ELDAwAhak2d42rPw3NA2h">                    <input x-model="url" id="videoUrl" name="videoUrl" type="url" placeholder="<?php echo $translations['Just insert a link'];?>"
+                           aria-label="Search Tiktok Video" class="splash-search-input pi-end" required>
+                    <button type="button" @click.prevent="pasteText()" x-show="canPaste"
+                            class="splash-paste-button mi-end" aria-label="Paste">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon mi-end" aria-hidden="true">
+    <path fill-rule="evenodd" d="M10.5 3A1.501 1.501 0 009 4.5h6A1.5 1.5 0 0013.5 3h-3zm-2.693.178A3 3 0 0110.5 1.5h3a3 3 0 012.694 1.678c.497.042.992.092 1.486.15 1.497.173 2.57 1.46 2.57 2.929V19.5a3 3 0 01-3 3H6.75a3 3 0 01-3-3V6.257c0-1.47 1.073-2.756 2.57-2.93.493-.057.989-.107 1.487-.15z" clip-rule="evenodd" />
+</svg>
+                        <span aria-hidden="true"><?php echo $translations['Paste'];?></span>
+                    </button>
+                    <button onclick="downloadVideo()" class="splash-search-button">
+                        <span x-show="!processing"><?php echo $translations['Download'];?></span>
+                        <svg x-show="processing" class="icon" x-cloak="true" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2">
+        <path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3"
+              d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z">
+            <animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/>
+        </path>
+        <path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12">
+            <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/>
+            <animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate"
+                              values="0 12 12;360 12 12"/>
+        </path>
+    </g>
+</svg>
+                    </button>
+                </div>
+            <!-- </form> -->
+        </div>
+               <!-- <template x-if="tiktokVideo"> -->
+            <div class="splash-video-wrapper">
+                <div class="splash-video">
+                    <img class="avatarimg" id="avatarImage" crossorigin="anonymous" />
+                    <div class="details-section">
+                            <img class="splash-video-bg" id="coverImage" crossorigin="anonymous">
+                            <h2 id="username"></h2>
+                            <p class="captionText" id="caption"></p>
+                    </div>
+
+                    <div class="download-section">
+                        
+                            <a target="_blank" id="downloadnoBtn" 
+                               referrerpolicy="no-referrer" data-extension="mp4"
+                               ><?php echo $translations['Without Watermark HD'];?></a> 
+                            <a id="downloadBtn" target="_blank"
+                               referrerpolicy="no-referrer" data-extension="mp4"
+                              ><?php echo $translations['Original Video with Watermark'];?></a>
+                            <a target="_blank" id="downloadmusicBtn" 
+                               referrerpolicy="no-referrer" id="audioLink" data-extension="mp3"
+                               ><?php echo $translations['Download MP3 Audio'];?></a>
+                                
+                                    <div id="trending-actions" class="trending-actions">
+                        				<div class="card-reaction">
+                        					<div>
+                        						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up">
+                        							<path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                        							</path>
+                        						</svg>
+                        					</div>
+                        					<div id="like">
+                        									</div>
+                        				</div>
+                        				<div class="card-reaction">
+                        					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square">
+                        						<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        					</svg>
+                        					<div id="comment">
+                        								</div>
+                        				</div>
+                        				<div class="card-reaction">
+                        					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-share-2">
+                        						<circle cx="18" cy="5" r="3"></circle>
+                        						<circle cx="6" cy="12" r="3"></circle>
+                        						<circle cx="18" cy="19" r="3"></circle>
+                        						<line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                        						<line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        					</svg>
+                        					<div id="share">					</div>
+                        				</div>
+                        			</div>
+                       </div>
+                </div>
+                <button class="reset-video" onClick="history.go(0);"><?php echo $translations['Download another video'];?></button>
+            </div>
+        <!-- </template> -->
+    </div>
+</section>
+    <section class="features-section" aria-label="Feature Section">
+    <div class="container">
+        <h2><?php echo $translations['Download TikTok videos with ease'];?></h2>
+        <div class="card">
+            <img src="theme-assets/images/feature-download.min.webp" alt="Unlimited downloads" height="125px"
+                 width="200px" loading="lazy"/>
+            <h3><?php echo $translations['Unlimited downloads'];?></h3>
+            <p><?php echo $translations['Save as many videos as you need, no limits or any other restrictions.'];?></p>
+        </div>
+        <div class="card">
+            <img src="theme-assets/images/feature-vip.min.webp" alt="No Watermark!" height="125px"
+                 width="200px"
+                 loading="lazy"/>
+            <h3><?php echo $translations['No TikTok Watermark!'];?></h3>
+            <p><?php echo $translations['Download TikTok videos without watermark, it removes the TikTok logo.'];?></p>
+        </div>
+        <div class="card">
+            <img src="theme-assets/images/feature-mp3.min.webp" alt="MP4 and MP3 supported" height="125px"
+                 width="200px" loading="lazy"/>
+            <h3><?php echo $translations['MP4 and MP3 supported'];?></h3>
+            <p><?php echo $translations['Save videos in hd quality, MP4 file format or convert to audio MP3.'];?></p>
+        </div>
+    </div>
+</section>
+    <section class="how-to-section" aria-label="How to Section">
+    <div class="container">
+        <h2><?php echo $translations['Download TikTok video without watermark'];?></h2>
+        <p><?php echo $translations['www.ccctik.com is a free tool helping you to download TikTok videos (formerly Musically) without watermarks online. Save TikTok video with the best quality in an MP4 file format with HD resolution. To find out how to use the TikTok video downloader, follow the instructions below. It’s simple process - you can download TikTok without watermark video in just three easy steps.'];?></p>
+        <div class="how-to-card">
+            <h3><?php echo $translations['How to download TikTok without watermark?'];?></h3>
+            <ol>
+                <li class="inset-i-start">
+                    <b><?php echo $translations['Find a TikTok'];?></b>
+                    <span><?php echo $translations['play a video that you want to save to your mobile device, using the TikTok app'];?></span>
+                </li>
+                <li class="inset-i-start">
+                    <b><?php echo $translations['Copy the link'];?></b>
+                    <span><?php echo $translations['tap "Share" (the arrow button on top of a chosen video), and then tap "Copy link"'];?></span>
+                </li>
+                <li class="inset-i-start">
+                    <b><?php echo $translations['Download'];?></b>
+                    <span><?php echo $translations['go back to TikTok Video Downloader and paste the link in the text field on the page and tap on the "Download" button'];?></span>
+                </li>
+            </ol>
+        </div>
+    </div>
+</section>
+    <section class="about-section" aria-label="About Section">
+    <div class="container">
+        <p><?php echo $translations['TikTok Video Downloader is one of the most popular tools to save no-watermark TikTok videos. No need to install any apps to use our service, all you need is a browser and a valid link to paste in the input field on TikTok Video Downloader website and remove the watermark from TikTok video.'];?></p>
+        <div class="service-cards">
+            <div class="service-card">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" >
+    <path fill-rule="evenodd" d="M15.621 4.379a3 3 0 00-4.242 0l-7 7a3 3 0 004.241 4.243h.001l.497-.5a.75.75 0 011.064 1.057l-.498.501-.002.002a4.5 4.5 0 01-6.364-6.364l7-7a4.5 4.5 0 016.368 6.36l-3.455 3.553A2.625 2.625 0 119.52 9.52l3.45-3.451a.75.75 0 111.061 1.06l-3.45 3.451a1.125 1.125 0 001.587 1.595l3.454-3.553a3 3 0 000-4.242z" clip-rule="evenodd" />
+</svg>
+                </div>
+                <p><?php echo $translations['It\'s a perfect solution for post-editing and publishing videos.'];?></p>
+            </div>
+            <div class="service-card">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" >
+    <path fill-rule="evenodd" d="M5.5 3A2.5 2.5 0 003 5.5v2.879a2.5 2.5 0 00.732 1.767l6.5 6.5a2.5 2.5 0 003.536 0l2.878-2.878a2.5 2.5 0 000-3.536l-6.5-6.5A2.5 2.5 0 008.38 3H5.5zM6 7a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+</svg>
+                </div>
+                <p><?php echo $translations['It is free. You can save as many mp4 files as you want.'];?></p>
+            </div>
+            <div class="service-card">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"  >
+    <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
+</svg>
+                </div>
+                <p><?php echo $translations['Registration is not required. Just open our website and paste the link.'];?></p>
+            </div>
+            <div class="service-card">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"  >
+    <path d="M11.983 1.907a.75.75 0 00-1.292-.657l-8.5 9.5A.75.75 0 002.75 12h6.572l-1.305 6.093a.75.75 0 001.292.657l8.5-9.5A.75.75 0 0017.25 8h-6.572l1.305-6.093z" />
+</svg>
+                </div>
+                <p><?php echo $translations['Download TikTok videos without watermark at high speed.'];?></p>
+            </div>
+            <div class="service-card">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"  >
+    <path fill-rule="evenodd" d="M17.721 1.599a.75.75 0 01.279.584v11.29a2.25 2.25 0 01-1.774 2.198l-2.041.442a2.216 2.216 0 01-.938-4.333l2.662-.576a.75.75 0 00.591-.734V6.112l-8 1.73v7.684a2.25 2.25 0 01-1.774 2.2l-2.042.44a2.216 2.216 0 11-.935-4.33l2.659-.574A.75.75 0 007 12.53V4.237a.75.75 0 01.591-.733l9.5-2.054a.75.75 0 01.63.149z" clip-rule="evenodd" />
+</svg>
+                </div>
+                <p><?php echo $translations['Save TikTok without watermark in mp4 or mp3 online.'];?></p>
+            </div>
+            <div class="service-card">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"  >
+    <path fill-rule="evenodd" d="M2 4.25A2.25 2.25 0 014.25 2h11.5A2.25 2.25 0 0118 4.25v8.5A2.25 2.25 0 0115.75 15h-3.105a3.501 3.501 0 001.1 1.677A.75.75 0 0113.26 18H6.74a.75.75 0 01-.484-1.323A3.501 3.501 0 007.355 15H4.25A2.25 2.25 0 012 12.75v-8.5zm1.5 0a.75.75 0 01.75-.75h11.5a.75.75 0 01.75.75v7.5a.75.75 0 01-.75.75H4.25a.75.75 0 01-.75-.75v-7.5z" clip-rule="evenodd" />
+</svg>
+                </div>
+                <p><?php echo $translations['TikTok download works in every browser and operating system.'];?></p>
+            </div>
+        </div>
+    </div>
+</section>
+    <section class="usage-section" aria-label="Usage Section">
+    <div class="container">
+        <div class="usage-list">
+            <div class="usage">
+                <div class="usage-content">
+                    <h3><?php echo $translations['How to download TikTok video on PC'];?></h3>
+                    <p><?php echo $translations['This method is universal and convenient. A file will be saved without any trademark in the highest quality. It works perfectly on Windows, Mac OS, and Linux. PC users are not required to install any additional apps to save TikTok videos, and this is another plus when using this method.'];?></p>
+                    <p><?php echo $translations['In order to use the TikTok Video Downloader app on PC, laptop (Windows 7, 10), Mac, or a laptop you will need to copy a link from the website.'];?></p>
+                    <p><?php echo $translations['Next, go back to TikTok Video Downloader tool and paste the link in the text field on the main page. After that, you need to click on the "Download" button to get the link.'];?></p>
+                </div>
+                <figure class="usage-image">
+                    <img src="theme-assets/images/usage-pc.min.png" alt="TikTok downloader on PC" width="1080"
+                         height="1080"/>
+                </figure>
+            </div>
+            <div class="usage">
+                <div class="usage-content">
+                    <h3><?php echo $translations['How to download TikTok video on iPhone or iPad (iOS)'];?></h3>
+                    <p><?php echo $translations['If you are an iPhone or iPad owner, you need to install the Documents by Readdle app from the App Store.'];?></p>
+                    <p><?php echo $translations['Due to Apple security policy, iOS users starting with the 12th version can\'t save TikTok videos directly from the browser. Copy the link of any TikTok file via the app, and launch the Documents by Readdle.'];?></p>
+                    <p><?php echo $translations['In the bottom right corner of the screen, you will see a web browser icon. Tap it.'];?></p>
+                    <p><?php echo $translations['When the browser is open, go to www.ccctik.com and paste the link in the text field. Choose the option you like and press the button again. The video will be saved to your device.'];?></p>
+                </div>
+                <figure class="usage-image">
+                    <img src="theme-assets/images/usage-ios.min.png" alt="TikTok downloader on iOS" width="1080"
+                         height="1080"/>
+                </figure>
+            </div>
+        </div>
+    </div>
+</section>
+    <section class="faq-section" aria-label="FAQ Section">
+    <div class="container">
+        <div class="accordion" x-data="AccordionComponent()">
+    <button class="accordion-toggle" @click="toggleShow()" :class="{'is-open': show}">
+        <h4><?php echo $translations['How to Download video Tiktok no watermark?'];?></h4>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon" aria-hidden="true" >
+    <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+</svg>
+    </button>
+    <div class="accordion-content" x-collapse x-cloak x-show="show">
+        <p><?php echo $translations['Open Tik Tok app on your phone/or Web on your browser. Choose whatever video you want to download. Click to the Share button at the right bottom. Click the Copy Link button. Download by using your browsers: I want to keep things simple for you. No need to download or install any software. I make an application for this purpose as well but you can only install whenever you like. Go back to TikTok Video Downloader and paste your download link to the field above then click to the Download button. Wait for our server to do its job and then, save the video to your device.'];?></p>
+    </div>
+</div>
+        <div class="accordion" x-data="AccordionComponent()">
+    <button class="accordion-toggle" @click="toggleShow()" :class="{'is-open': show}">
+        <h4><?php echo $translations['How to get the TikTok video download link?'];?></h4>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon" aria-hidden="true" >
+    <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+</svg>
+    </button>
+    <div class="accordion-content" x-collapse x-cloak x-show="show">
+        <p><?php echo $translations['Open your TikTok application Choose the TikTok video that you want to download Click Share and at the Share options, find Copy Link button Your download URL is ready on the clipboard. For example, the link would look like this https://v.douyin.com/UFLNjnh/ or https://www.tiktok.com/@philandmore/video/6805867805452324102 or https://m.tiktok.com/v/6805867805452324102.html and more...'];?></p>
+    </div>
+</div>
+        <div class="accordion" x-data="AccordionComponent()">
+    <button class="accordion-toggle" @click="toggleShow()" :class="{'is-open': show}">
+        <h4><?php echo $translations['Where are TikTok videos saved after being downloaded?'];?></h4>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon" aria-hidden="true" >
+    <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+</svg>
+    </button>
+    <div class="accordion-content" x-collapse x-cloak x-show="show">
+        <p><?php echo $translations['When you\'re downloading files, they are usually saved into whatever folder you have set as your default. Your browser normally sets this folder for you. In browser settings, you can change and choose manually the destination folder for your downloaded TikTok videos.'];?></p>
+    </div>
+</div>
+        <div class="accordion" x-data="AccordionComponent()">
+    <button class="accordion-toggle" @click="toggleShow()" :class="{'is-open': show}">
+        <h4><?php echo $translations['Does TikTok Video Downloader store downloaded videos or keep a copy of videos?'];?></h4>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon" aria-hidden="true" >
+    <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+</svg>
+    </button>
+    <div class="accordion-content" x-collapse x-cloak x-show="show">
+        <p><?php echo $translations['TikTok Video Downloader doesn\'t store videos, neither do i keep copies of downloaded videos. All videos are hosted on TikTok\'s servers. Also, i don\'t keep track of the download histories of our users, thus making using TikTok Video Downloader totally anonymous.'];?></p>
+    </div>
+</div>
+        <div class="accordion" x-data="AccordionComponent()">
+    <button class="accordion-toggle" @click="toggleShow()" :class="{'is-open': show}">
+        <h4><?php echo $translations['Do I need to install instructions or extensions?'];?></h4>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon" aria-hidden="true" >
+    <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+</svg>
+    </button>
+    <div class="accordion-content" x-collapse x-cloak x-show="show">
+        <p><?php echo $translations['No. I try to keep things easy for our users. All you need is your TikTok download video links. That\'s it.'];?></p>
+    </div>
+</div>
+        <div class="accordion" x-data="AccordionComponent()">
+    <button class="accordion-toggle" @click="toggleShow()" :class="{'is-open': show}">
+        <h4><?php echo $translations['Do I have to pay to Tiktok Downloader without watermark (TikTok Video Downloader)?'];?></h4>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon" aria-hidden="true" >
+    <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+</svg>
+    </button>
+    <div class="accordion-content" x-collapse x-cloak x-show="show">
+        <p><?php echo $translations['No, you don\'t have to pay for anything because our software is always free. You can support us by turning off your Ad Blocks or making donations. It supports our further development.'];?></p>
+    </div>
+</div>
+        <div class="accordion" x-data="AccordionComponent()">
+    <button class="accordion-toggle" @click="toggleShow()" :class="{'is-open': show}">
+        <h4><?php echo $translations['Can I use this Tiktok video downloader on my Android phone?'];?></h4>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon" aria-hidden="true" >
+    <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+</svg>
+    </button>
+    <div class="accordion-content" x-collapse x-cloak x-show="show">
+        <p><?php echo $translations['Yes, it’s better to use TikTok Video Downloader to save no-watermark TikTok videos on your Android phone. TikTok Video Downloader is super FAST, 100% FREE, and getting updated frequently.'];?></p>
+    </div>
+</div>
+        <div class="accordion" x-data="AccordionComponent()">
+    <button class="accordion-toggle" @click="toggleShow()" :class="{'is-open': show}">
+        <h4><?php echo $translations['How do I save tiktok video /download my favorite Tik Tok mp4 videos to my iPhone (IOS)?'];?></h4>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon" aria-hidden="true" >
+    <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+</svg>
+    </button>
+    <div class="accordion-content" x-collapse x-cloak x-show="show">
+        <p><?php echo $translations['Because of Apple\'s privacy policy, from IOS 12 and IPAD OS 12 and below you cannot download any videos, music or movies to your iPhone. You should update to the latest iOS to be able to use Safari to download Tiktok videos From TikTok Video Downloader. If you still can\'t download please follow the tutorial How to download tiktok videos without watermark on iPhone'];?></p>
+    </div>
+</div>
+        <div class="accordion" x-data="AccordionComponent()">
+    <button class="accordion-toggle" @click="toggleShow()" :class="{'is-open': show}">
+        <h4><?php echo $translations['Is there a limit to download Tiktok videos at TikTok Video Downloader?'];?></h4>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon" aria-hidden="true" >
+    <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+</svg>
+    </button>
+    <div class="accordion-content" x-collapse x-cloak x-show="show">
+        <p><?php echo $translations['No, you can download many of your favorite TikTok videos at TikTok Video Downloader with no download limit.'];?></p>
+    </div>
+</div>
+        <div class="accordion" x-data="AccordionComponent()">
+    <button class="accordion-toggle" @click="toggleShow()" :class="{'is-open': show}">
+        <h4><?php echo $translations['Does TikTok Video Downloader support downloading multiple videos / Download all videos from a certain tiktok / Htags channel?'];?></h4>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon" aria-hidden="true" >
+    <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+</svg>
+    </button>
+    <div class="accordion-content" x-collapse x-cloak x-show="show">
+        <p><?php echo $translations['No, TikTok Video Downloader does not support this feature yet.'];?></p>
+    </div>
+</div>
+        <div class="accordion" x-data="AccordionComponent()">
+    <button class="accordion-toggle" @click="toggleShow()" :class="{'is-open': show}">
+        <h4><?php echo $translations['Can I download high resolution TikTok videos at TikTok Video Downloader?'];?></h4>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon" aria-hidden="true" >
+    <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+</svg>
+    </button>
+    <div class="accordion-content" x-collapse x-cloak x-show="show">
+        <p><?php echo $translations['Yes, TikTok Video Downloader is the TikTok video downloader that provides the highest resolution for you. If we find a Full HD or higher resolution of a Tiktok video, we will immediately show a high quality Download link and you can download it.'];?></p>
+    </div>
+</div>
+        <div class="accordion" x-data="AccordionComponent()">
+    <button class="accordion-toggle" @click="toggleShow()" :class="{'is-open': show}">
+        <h4><?php echo $translations['Can I edit TikTok videos downloaded at TikTok Video Downloader?'];?></h4>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon" aria-hidden="true" >
+    <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+</svg>
+    </button>
+    <div class="accordion-content" x-collapse x-cloak x-show="show">
+        <p><?php echo $translations['No, TikTok Video Downloader is just a TikTok video downloader, not supporting video editing. Use specialized video editing software on your phone or PC'];?></p>
+    </div>
+</div>
+        <div class="accordion" x-data="AccordionComponent()">
+    <button class="accordion-toggle" @click="toggleShow()" :class="{'is-open': show}">
+        <h4><?php echo $translations['Does TikTok Video Downloader provide tiktok mp3 download solution?'];?></h4>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon" aria-hidden="true" >
+    <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+</svg>
+    </button>
+    <div class="accordion-content" x-collapse x-cloak x-show="show">
+        <p><?php echo $translations['TikTok Video Downloader respects the intellectual property rights of the tracks so TikTok Video Downloader will not provide this solution. However, there are currently quite a few application websites that provide this Tiktok Mp3 service such as Tikmate, SaveTik.Net, SSStiktok, etc. You can download TikTok mp3 music but are not allowed to use it for commercial activities, monetize it.'];?></p>
+    </div>
+</div>
+    </div>
+</section>
+<footer class="footer">
+    <nav class="footer-nav" aria-label="Footer Navigation">
+        <a href="contact.html"><?php echo $translations['Contact Us'];?></a>
+        <a href="tos"><?php echo $translations['Terms of Service'];?></a>
+        <a href="privacy"><?php echo $translations['Privacy Policy'];?></a>
+        <a href="faq"><?php echo $translations['FAQ'];?></a>
+    </nav>
+    <noindex>
+        <b><?php echo $translations['This product is in no way affiliated with, authorized, maintained, sponsored or endorsed by TikTok or any of its affiliates or subsidiaries.'];?></b>
+    </noindex>
+    <p>Copyright © 2024</p>
+</footer>
+<script>
+    window.RequestError = class extends Error {
+        constructor(response) {
+            super(response.status);
+            this.response = response;
+        }
+    }
+    window.handleErrors = function (e) {
+        if (!(e instanceof window.RequestError)) {
+            window.toasted.show(e.message, {
+                type: "error"
+            });
+        }
+        const isJson = e.response.headers.get('Content-Type') === 'application/json';
+        const promise = isJson ? e.response.json() : e.response.text();
+        promise.then(function (data) {
+            if (isJson) {
+                window.toasted.show(data.message, {
+                    type: "error"
+                });
+            } else {
+                const backdrop = document.createElement('div');
+                const bdStyles = {
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    background: 'rgba(0,0,0,0.5)',
+                    zIndex: 9999,
+                }
+                for (style in bdStyles)
+                    backdrop.style[style] = bdStyles[style]
+                const iframe = document.createElement("iframe")
+                const styles = {
+                    position: "fixed",
+                    height: '90vh',
+                    width: '90vw',
+                    top: '5vh',
+                    left: '5vw',
+                    borderRadius: '8px',
+                    backgroundColor: '#18171B',
+                    border: '0px',
+                    zIndex: 99999
+                };
+                for (style in styles)
+                    iframe.style[style] = styles[style];
+                backdrop.addEventListener('click', function () {
+                    backdrop.remove();
+                    iframe.remove();
+                });
+                iframe.sandbox.add('allow-scripts', 'allow-same-origin', 'allow-popups', 'allow-forms');
+                document.body.append(backdrop, iframe);
+                const page = document.createElement('html')
+                page.innerHTML = data
+                iframe.contentWindow.document.open()
+                iframe.contentWindow.document.write(page.outerHTML)
+                iframe.contentWindow.document.close()
+            }
+        });
+    }
+</script>
+    <script>
+        function SplashComponent() {
+            return {
+                /**
+                 * @var {Record<string, any|Record<string,any>|Record<string,any>[]>}
+                 */
+                tiktokVideo: null,
+                url: "",
+                processing: false,
+                imageFailed: false,
+                onImageFail() {
+                    this.imageFailed = true;
+                },
+                submitForm() {
+                    if (!validateURL(this.url)) {
+                        return window.toasted.show("Please enter a valid URL", {
+                            type: "error"
+                        });
+                    }
+                    this.processing = true;
+                    const instance = this;
+                    const formData = new FormData(this.$refs.form);
+                    fetch(this.$refs.form.action, {method: this.$refs.form.method,
+                        body: formData,
+                        headers: {
+                            "accept": "application/json"
+                        }
+                    })
+                        .then(function (response) {
+                            if (response.status !== 200 || !response.headers.get('content-type').includes('json')) {
+                                throw new window.RequestError(response);
+                            }
+                            return response.json();
+                        })
+                        .then(function (data) {
+                            instance.imageFailed = false;
+                            instance.tiktokVideo = true;
+                        })
+                        .catch(function (error) {
+                            window.handleErrors(error);
+                        })
+                        .finally(function () {
+                            instance.processing = false;
+                        });
+                },
+                //Paste logic
+                get canPaste() {
+                    return window.navigator.clipboard;
+                },
+                pasteText() {
+                    if (this.canPaste) {
+                        const instance = this;
+                        window.navigator.clipboard.readText().then(function (text) {
+                            instance.url = text;
+                        });
+                    }
+                },
+                downloadText(download) {
+                    return (download.isHD ? "Without Watermark [:idx] HD" : "Without Watermark [:idx]").replace(":idx", download.idx + 1);
+                },
+                downloadSize(download) {
+                    if (!download.size) return ''
+                    return ' ' + bytesToSize(download.size);
+                },
+                searchVideo(event) {
+                    const instance = this;
+                    this.resetVideo(event.detail).then(function () {
+                        instance.submitForm();
+                        window.scrollTo({top: 0});
+                    });
+                },
+                resetVideo(url = "") {
+                    this.url = url;
+                    this.tiktokVideo = null;
+                    return this.$nextTick();
+                },
+                downloadVideo(e) {
+                    let anchorEl = e.target;
+                    if (anchorEl.tagName.toLowerCase() !== 'a') {
+                        anchorEl = anchorEl.closest('a');
+                    }
+                    if (!anchorEl || !anchorEl.href) return;
+                    const url = new URL('/download', 'https://www.ccctik.com');
+                    const extension = anchorEl.dataset.extension ?? 'mp4';
+                    const size = anchorEl.dataset.size;
+                    url.searchParams.set('url', btoa(anchorEl.href));
+                    url.searchParams.set('extension', extension);
+                    if (typeof size === 'string' && size.trim() !== '')
+                        url.searchParams.set('size', size);
+                    open(url.toString(), "_blank");
+                }
+            };
+        }
+        function bytesToSize(bytes) {
+            const units = ["byte", "kilobyte", "megabyte", "terabyte", "petabyte"];
+            const unit = Math.floor(Math.log(bytes) / Math.log(1024));
+            return new Intl.NumberFormat("en", {
+                style: "unit",
+                unit: units[unit],
+                unitDisplay: 'narrow',
+                notation: 'compact'
+            }).format(bytes / 1024 ** unit);
+        }
+        function validateURL(url) {
+            return /^(https?:\/\/)?(www\.)?vm\.tiktok\.com\/[^\n]+\/?$/.test(url)
+                || /^(https?:\/\/)?(www\.)?m\.tiktok\.com\/v\/[^\n]+\.html([^\n]+)?$/.test(url)
+                || /^(https?:\/\/)?(www\.)?tiktok\.com\/t\/[^\n]+\/?$/.test(url)
+                || /^(https?:\/\/)?(www\.)?tiktok\.com\/@[^\n]+\/video\/[^\n]+$/.test(url)
+                || /^(https?:\/\/)?(www\.)?vt\.tiktok\.com\/[^\n]+\/?$/.test(url)
+        }
+    </script>
+
+
+
+
+
+
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script>
+    function downloadVideo() {
+        document.getElementById("loader").style.display = "block";
+        var videoUrl = document.getElementById('videoUrl').value;
+        if (!videoUrl) {
+            alert('Please enter a valid TikTok video URL.');
+            document.getElementById("loader").style.display = "none";
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'fetch.php?url=' + encodeURIComponent(videoUrl), true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                var result = JSON.parse(xhr.responseText);
+                if (result.error) {
+                    alert(result.error);
+                } else {
+                    document.getElementById("loader").style.display = "none";
+                  // Extract and display the username
+                    var offSplash = document.querySelector('.splash-form');
+                    offSplash.style.display = 'none';
+                    var blockSplash = document.querySelector('.splash-video-wrapper');
+                    blockSplash.style.display = 'block';
+
+                    // Set Username
+                    var username = result.data.author.nickname;
+                    document.getElementById('username').innerHTML = username;
+                    // Set caption
+                    var caption = result.data.title;
+                    document.getElementById('caption').innerHTML = caption;
+                    // Set Video INFO
+                    var like = result.data.digg_count;
+                    document.getElementById('like').innerHTML = like;
+
+                    var comment = result.data.comment_count;
+                    document.getElementById('comment').innerHTML = comment;
+
+                    var share = result.data.share_count;
+                    document.getElementById('share').innerHTML = share;
+
+                    var fileName = result.data.title;
+
+                    // without Watermark download
+                    // Extract fileUrl from result
+                    var fileUrldownloadBtn = result.data.play;
+
+                    // Concatenate the URL
+                    var fullUrldownloadBtn = 'download.php?url=' + encodeURIComponent(fileUrldownloadBtn) + '&name=' + fileName;
+                    $('#downloadBtn').attr('href', fullUrldownloadBtn);
+
+                        // Download Without watermark
+                    var fileUrldownloadnoBtn = result.data.play;
+
+                    // Concatenate the URL
+                    var fullUrldownloadnoBtn = 'download.php?url=' + encodeURIComponent(fileUrldownloadnoBtn) + '&name=' + fileName;
+                    $('#downloadnoBtn').attr('href', fullUrldownloadnoBtn);
+                    
+                    // Download music 
+                    var fileUrlmusic = result.data.music;
+
+                    var fullUrldownloadmusic = 'download.php?url2=' + encodeURIComponent(fileUrlmusic) + '&name=' + fileName;
+                    $('#downloadmusicBtn').attr('href', fullUrldownloadmusic);
+                    
+                    // Set cover image source
+                    var coverImage = document.getElementById('coverImage');
+                    if (coverImage) {
+                        coverImage.src = result.data.origin_cover; // Update with the correct property
+                    }
+                    // Set cover image source
+                    var avatarImage = document.getElementById('avatarImage');
+                    if (avatarImage) {
+                        avatarImage.src = result.data.author.avatar; // Update with the correct property
+                    }
+                }
+            } else {
+                alert('Failed to download video. Please try again later.');
+            }
+        };
+        xhr.send();
+    }
+</script>
+
+
+<script>
+    function ChangeLocaleComponent() {
+        return {
+            showMenu: false,
+            toggleMenu() {
+                this.showMenu = !this.showMenu;
+            },
+            closeMenu() {
+                this.showMenu = false;
+            },
+            getCurrentLocale() {
+                // Get current locale from cookie or default to English
+                const langCookie = document.cookie.split(';').find(cookie => cookie.trim().startsWith('lang='));
+                if (langCookie) {
+                    return langCookie.split('=')[1];
+                } else {
+                    return 'English'; // Default to English
+                }
+            }
+        };
+    }
+</script>
+
+    <script>
+        function AccordionComponent() {
+            return {
+                show: false,
+                toggleShow() {
+                    this.show = !this.show;
+                }
+            };
+        }
+    </script>
+    <script>
+        function HeaderComponent() {
+            return {
+                showNav: false,
+                toggleNav() {
+                    this.showNav = !this.showNav;
+                }
+            };
+        }
+    </script>
+    <script>
+        function ChangeLocaleComponent() {
+            return {
+                showMenu: false,
+                closeMenu() {
+                    this.showMenu = false;
+                },
+                toggleMenu() {
+                    this.showMenu = !this.showMenu;
+                }
+            };
+        }
+    </script>
+</html>
